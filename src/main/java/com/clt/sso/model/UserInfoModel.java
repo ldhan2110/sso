@@ -93,7 +93,7 @@ public class UserInfoModel implements UserModel {
 
     @Override
     public void setUsername(String username) {
-        this.usrNm = username;
+        // Read-only storage — no-op
     }
 
     @Override
@@ -103,7 +103,7 @@ public class UserInfoModel implements UserModel {
 
     @Override
     public void setCreatedTimestamp(Long timestamp) {
-        this.creDt = timestamp;
+        // Read-only storage — no-op
     }
 
     @Override
@@ -113,7 +113,7 @@ public class UserInfoModel implements UserModel {
 
     @Override
     public void setEnabled(boolean enabled) {
-        this.actFlg = enabled ? "Y" : "N";
+        // Read-only storage — no-op
     }
 
     @Override
@@ -147,15 +147,18 @@ public class UserInfoModel implements UserModel {
 
     @Override
     public Stream<String> getAttributeStream(String name) {
-        String first = getFirstAttribute(name);
-        if (first == null) {
-            return Stream.empty();
+        switch (name) {
+            case UserModel.FIRST_NAME:
+            case UserModel.LAST_NAME:
+            case UserModel.EMAIL:
+            case UserModel.USERNAME:
+            case "emailVerified":
+                String val = getFirstAttribute(name);
+                return val != null ? Stream.of(val) : Stream.empty();
+            default:
+                List<String> values = customAttributes.get(name);
+                return (values != null) ? values.stream() : Stream.empty();
         }
-        List<String> custom = customAttributes.get(name);
-        if (custom != null) {
-            return custom.stream();
-        }
-        return Stream.of(first);
     }
 
     @Override
@@ -211,7 +214,7 @@ public class UserInfoModel implements UserModel {
 
     @Override
     public void setEmail(String email) {
-        this.usrEml = email;
+        // Read-only storage — no-op
     }
 
     @Override

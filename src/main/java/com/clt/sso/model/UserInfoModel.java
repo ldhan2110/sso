@@ -30,7 +30,26 @@ public class UserInfoModel implements UserModel {
     private String lastName;
     private boolean emailVerified;
 
-    // ── Role mappings ────────────────────────────────────────────────────────
+    // Stateless stub — shared across all instances of this read-only model.
+    private static final SubjectCredentialManager NOOP_CREDENTIAL_MANAGER = new SubjectCredentialManager() {
+        @Override public boolean isValid(List<CredentialInput> inputs) { return false; }
+        @Override public boolean updateCredential(CredentialInput input) { return false; }
+        @Override public void updateStoredCredential(CredentialModel cred) {}
+        @Override public CredentialModel createStoredCredential(CredentialModel cred) { return null; }
+        @Override public boolean removeStoredCredentialById(String id) { return false; }
+        @Override public CredentialModel getStoredCredentialById(String id) { return null; }
+        @Override public Stream<CredentialModel> getStoredCredentialsStream() { return Stream.empty(); }
+        @Override public Stream<CredentialModel> getStoredCredentialsByTypeStream(String type) { return Stream.empty(); }
+        @Override public CredentialModel getStoredCredentialByNameAndType(String name, String type) { return null; }
+        @Override public boolean moveStoredCredentialTo(String id, String newPreviousCredentialId) { return false; }
+        @Override public void updateCredentialLabel(String credentialId, String credentialLabel) {}
+        @Override public void disableCredentialType(String credentialType) {}
+        @Override public Stream<String> getDisableableCredentialTypesStream() { return Stream.empty(); }
+        @Override public boolean isConfiguredFor(String type) { return false; }
+        @Override @Deprecated public boolean isConfiguredLocally(String type) { return false; }
+        @Override @Deprecated public Stream<String> getConfiguredUserStorageCredentialTypesStream() { return Stream.empty(); }
+        @Override @Deprecated public CredentialModel createCredentialThroughProvider(CredentialModel model) { return null; }
+    };
 
     @Override
     public Stream<RoleModel> getRealmRoleMappingsStream() {
@@ -49,7 +68,7 @@ public class UserInfoModel implements UserModel {
 
     @Override
     public void grantRole(RoleModel role) {
-        // Keycloak-managed — no-op
+        // Read-only storage — no-op
     }
 
     @Override
@@ -61,8 +80,6 @@ public class UserInfoModel implements UserModel {
     public void deleteRoleMapping(RoleModel role) {
         // Read-only storage — no-op
     }
-
-    // ── Identity ─────────────────────────────────────────────────────────────
 
     @Override
     public String getId() {
@@ -99,8 +116,6 @@ public class UserInfoModel implements UserModel {
         this.actFlg = enabled ? "Y" : "N";
     }
 
-    // ── Attributes ───────────────────────────────────────────────────────────
-
     @Override
     public void setSingleAttribute(String name, String value) {
         // Read-only storage — no-op
@@ -119,11 +134,11 @@ public class UserInfoModel implements UserModel {
     @Override
     public String getFirstAttribute(String name) {
         switch (name) {
-            case UserModel.FIRST_NAME:     return this.firstName;
-            case UserModel.LAST_NAME:      return this.lastName;
-            case UserModel.EMAIL:          return this.usrEml;
-            case UserModel.USERNAME:       return this.usrNm;
-            case "emailVerified":          return String.valueOf(this.emailVerified);
+            case UserModel.FIRST_NAME: return this.firstName;
+            case UserModel.LAST_NAME:  return this.lastName;
+            case UserModel.EMAIL:      return this.usrEml;
+            case UserModel.USERNAME:   return this.usrNm;
+            case "emailVerified":      return String.valueOf(this.emailVerified);
             default:
                 List<String> values = customAttributes.get(name);
                 return (values != null && !values.isEmpty()) ? values.get(0) : null;
@@ -136,9 +151,9 @@ public class UserInfoModel implements UserModel {
         if (first == null) {
             return Stream.empty();
         }
-        List<String> values = customAttributes.get(name);
-        if (values != null) {
-            return values.stream();
+        List<String> custom = customAttributes.get(name);
+        if (custom != null) {
+            return custom.stream();
         }
         return Stream.of(first);
     }
@@ -146,15 +161,13 @@ public class UserInfoModel implements UserModel {
     @Override
     public Map<String, List<String>> getAttributes() {
         Map<String, List<String>> attrs = new HashMap<>(customAttributes);
-        if (this.firstName != null)  attrs.put(UserModel.FIRST_NAME, List.of(this.firstName));
-        if (this.lastName != null)   attrs.put(UserModel.LAST_NAME,  List.of(this.lastName));
-        if (this.usrEml != null)     attrs.put(UserModel.EMAIL,      List.of(this.usrEml));
-        if (this.usrNm != null)      attrs.put(UserModel.USERNAME,   List.of(this.usrNm));
+        if (this.firstName != null) attrs.put(UserModel.FIRST_NAME, List.of(this.firstName));
+        if (this.lastName != null)  attrs.put(UserModel.LAST_NAME,  List.of(this.lastName));
+        if (this.usrEml != null)    attrs.put(UserModel.EMAIL,      List.of(this.usrEml));
+        if (this.usrNm != null)     attrs.put(UserModel.USERNAME,   List.of(this.usrNm));
         attrs.put("emailVerified", List.of(String.valueOf(this.emailVerified)));
         return Collections.unmodifiableMap(attrs);
     }
-
-    // ── Required actions ─────────────────────────────────────────────────────
 
     @Override
     public Stream<String> getRequiredActionsStream() {
@@ -170,8 +183,6 @@ public class UserInfoModel implements UserModel {
     public void removeRequiredAction(String action) {
         // Read-only storage — no-op
     }
-
-    // ── Name / email ─────────────────────────────────────────────────────────
 
     @Override
     public String getFirstName() {
@@ -213,8 +224,6 @@ public class UserInfoModel implements UserModel {
         // Read-only storage — no-op
     }
 
-    // ── Groups ───────────────────────────────────────────────────────────────
-
     @Override
     public Stream<GroupModel> getGroupsStream() {
         return Stream.empty();
@@ -222,7 +231,7 @@ public class UserInfoModel implements UserModel {
 
     @Override
     public void joinGroup(GroupModel group) {
-        // Keycloak-managed — no-op
+        // Read-only storage — no-op
     }
 
     @Override
@@ -234,8 +243,6 @@ public class UserInfoModel implements UserModel {
     public boolean isMemberOf(GroupModel group) {
         return false;
     }
-
-    // ── Federation / service account ─────────────────────────────────────────
 
     @Override
     public String getFederationLink() {
@@ -257,98 +264,8 @@ public class UserInfoModel implements UserModel {
         // Read-only storage — no-op
     }
 
-    // ── Credential manager ───────────────────────────────────────────────────
-
     @Override
     public SubjectCredentialManager credentialManager() {
-        return new SubjectCredentialManager() {
-            @Override
-            public boolean isValid(List<CredentialInput> inputs) {
-                return false;
-            }
-
-            @Override
-            public boolean updateCredential(CredentialInput input) {
-                return false;
-            }
-
-            @Override
-            public void updateStoredCredential(CredentialModel cred) {
-                // no-op
-            }
-
-            @Override
-            public CredentialModel createStoredCredential(CredentialModel cred) {
-                return null;
-            }
-
-            @Override
-            public boolean removeStoredCredentialById(String id) {
-                return false;
-            }
-
-            @Override
-            public CredentialModel getStoredCredentialById(String id) {
-                return null;
-            }
-
-            @Override
-            public Stream<CredentialModel> getStoredCredentialsStream() {
-                return Stream.empty();
-            }
-
-            @Override
-            public Stream<CredentialModel> getStoredCredentialsByTypeStream(String type) {
-                return Stream.empty();
-            }
-
-            @Override
-            public CredentialModel getStoredCredentialByNameAndType(String name, String type) {
-                return null;
-            }
-
-            @Override
-            public boolean moveStoredCredentialTo(String id, String newPreviousCredentialId) {
-                return false;
-            }
-
-            @Override
-            public void updateCredentialLabel(String credentialId, String credentialLabel) {
-                // no-op
-            }
-
-            @Override
-            public void disableCredentialType(String credentialType) {
-                // no-op
-            }
-
-            @Override
-            public Stream<String> getDisableableCredentialTypesStream() {
-                return Stream.empty();
-            }
-
-            @Override
-            public boolean isConfiguredFor(String type) {
-                return false;
-            }
-
-            @Override
-            @Deprecated
-            public boolean isConfiguredLocally(String type) {
-                return false;
-            }
-
-            @Override
-            @Deprecated
-            public Stream<String> getConfiguredUserStorageCredentialTypesStream() {
-                return Stream.empty();
-            }
-
-            @Override
-            @Deprecated
-            public CredentialModel createCredentialThroughProvider(CredentialModel model) {
-                return null;
-            }
-        };
+        return NOOP_CREDENTIAL_MANAGER;
     }
 }

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clt.sso.mapper.UserInfoMapper">
+
+    <select id="findByTentIdAndUsrId" resultType="com.clt.sso.model.UserInfoModel">
+        SELECT tent_id, usr_id, usr_nm, usr_pwd, usr_eml, act_flg,
+               cre_dt, cre_usr_id, upd_dt, upd_usr_id,
+               first_name, last_name, email_verified
+        FROM sso_user
+        WHERE tent_id = #{tentId} AND usr_id = #{usrId}
+    </select>
+
+    <select id="findByTentIdAndUsrNm" resultType="com.clt.sso.model.UserInfoModel">
+        SELECT tent_id, usr_id, usr_nm, usr_pwd, usr_eml, act_flg,
+               cre_dt, cre_usr_id, upd_dt, upd_usr_id,
+               first_name, last_name, email_verified
+        FROM sso_user
+        WHERE tent_id = #{tentId} AND usr_nm = #{usrNm}
+    </select>
+
+</mapper>

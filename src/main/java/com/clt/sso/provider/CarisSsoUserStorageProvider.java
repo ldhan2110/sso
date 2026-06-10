@@ -13,7 +13,9 @@ import org.keycloak.storage.user.UserLookupProvider;
 
 import org.apache.ibatis.session.SqlSession;
 
-import at.favre.lib.crypto.bcrypt.BCrypt;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import com.clt.sso.mapper.UserInfoMapper;
 import com.clt.sso.model.UserInfoAdapter;
@@ -92,10 +94,23 @@ public class CarisSsoUserStorageProvider implements UserStorageProvider, UserLoo
         if (storedHash == null) {
             return false;
         }
-        BCrypt.Result result = BCrypt.verifyer().verify(
-                credentialInput.getChallengeResponse().toCharArray(),
-                storedHash.toCharArray());
-        return result.verified;
+        String inputHash = md5Hex(credentialInput.getChallengeResponse());
+        return storedHash.equals(inputHash);
+    }
+
+    private static String md5Hex(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] digest = md.digest(input.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder(digest.length * 2);
+            for (byte b : digest) {
+                sb.append(Integer.toHexString((0xF0 & b) >> 4));
+                sb.append(Integer.toHexString(0x0F & b));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("MD5 not available", e);
+        }
     }
 
     // --- UserStorageProvider ---

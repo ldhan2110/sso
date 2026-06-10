@@ -1,6 +1,5 @@
 package com.clt.sso.provider;
 
-import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.clt.sso.mapper.UserInfoMapper;
 import com.clt.sso.model.UserInfoAdapter;
 import com.clt.sso.model.UserInfoModel;
@@ -64,7 +63,7 @@ class CarisSsoUserStorageProviderTest {
         entity.setActFlg("Y");
         entity.setFirstName("John");
         entity.setLastName("Doe");
-        entity.setUsrPwd(BCrypt.withDefaults().hashToString(10, "secret123".toCharArray()));
+        entity.setUsrPwd("5d7845ac6ee7cfffafc5fe5f35cf666d"); // MD5 hex of "secret123"
         return entity;
     }
 

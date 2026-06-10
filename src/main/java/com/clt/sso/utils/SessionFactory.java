@@ -6,24 +6,25 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.jboss.logging.Logger;
 
 public class SessionFactory {
-	private static SqlSessionFactory sqlSessionFactory;
+	private static final Logger LOG = Logger.getLogger(SessionFactory.class);
+	private static final SqlSessionFactory sqlSessionFactory;
 
 	static {
 		try {
-			// Load MyBatis configuration file
 			String resource = "mybatis-config.xml";
 			Reader reader = Resources.getResourceAsReader(resource);
-
-			// Build SqlSessionFactory
 			sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+			LOG.info("MyBatis SqlSessionFactory initialized successfully");
 		} catch (Exception e) {
-			e.printStackTrace(); // Log properly in real code
+			LOG.error("Failed to initialize MyBatis SqlSessionFactory", e);
+			throw new ExceptionInInitializerError(e);
 		}
 	}
 
 	public static SqlSession getSqlSession() {
-		return sqlSessionFactory.openSession(); // Opens a new SqlSession
+		return sqlSessionFactory.openSession();
 	}
 }

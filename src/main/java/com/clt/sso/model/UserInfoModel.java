@@ -1,5 +1,6 @@
 package com.clt.sso.model;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,9 +15,9 @@ public class UserInfoModel {
     private String usrPwd;
     private String usrEml;
     private String actFlg;
-    private long creDt;
+    private LocalDateTime creDt;
     private String creUsrId;
-    private long updDt;
+    private LocalDateTime updDt;
     private String updUsrId;
     private String firstName;
     private String lastName;

@@ -16,7 +16,7 @@
                cre_dt, cre_usr_id, upd_dt, upd_usr_id,
                first_name, last_name, email_verified
         FROM sso_user
-        WHERE tent_id = #{tentId} AND usr_nm = #{usrNm}
+        WHERE UPPER(tent_id) = UPPER(#{tentId}) AND usr_id = #{usrNm}
     </select>
 
 </mapper>

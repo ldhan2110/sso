@@ -1,5 +1,6 @@
 package com.clt.sso.model;
 
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -86,7 +87,9 @@ public class UserInfoAdapter extends AbstractUserAdapterFederatedStorage {
 
     @Override
     public Long getCreatedTimestamp() {
-        return entity.getCreDt();
+        return entity.getCreDt().atZone(ZoneId.systemDefault())
+        .toInstant()
+        .toEpochMilli();
     }
 
     @Override

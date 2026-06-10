@@ -9,6 +9,8 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.storage.federated.UserFederatedStorageProvider;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +41,7 @@ class UserInfoAdapterTest {
         entity.setFirstName("John");
         entity.setLastName("Doe");
         entity.setEmailVerified(true);
-        entity.setCreDt(1700000000L);
+        entity.setCreDt(LocalDateTime.of(2023, 11, 14, 22, 13, 20));
 
         session = mock(KeycloakSession.class);
         realm = mock(RealmModel.class);
@@ -114,13 +116,17 @@ class UserInfoAdapterTest {
 
     @Test
     void getCreatedTimestamp_returnsEntityValue() {
-        assertEquals(1700000000L, adapter.getCreatedTimestamp());
+        long expectedMillis = LocalDateTime.of(2023, 11, 14, 22, 13, 20)
+                .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        assertEquals(expectedMillis, adapter.getCreatedTimestamp());
     }
 
     // --- Read-only setters ---
 
     @Test
     void setters_areNoOps() {
+        long originalTimestamp = adapter.getCreatedTimestamp();
+
         adapter.setUsername("newuser");
         assertEquals("TENANT1::johndoe", adapter.getUsername());
 
@@ -140,7 +146,7 @@ class UserInfoAdapterTest {
         assertTrue(adapter.isEnabled());
 
         adapter.setCreatedTimestamp(9999L);
-        assertEquals(1700000000L, adapter.getCreatedTimestamp());
+        assertEquals(originalTimestamp, adapter.getCreatedTimestamp());
     }
 
     // --- Attributes ---

@@ -1,5 +1,6 @@
 plugins {
 	id 'java'
+	id 'com.gradleup.shadow' version '9.0.0-beta12'
 	id 'org.springframework.boot' version '4.0.6'
 	id 'io.spring.dependency-management' version '1.1.7'
 }
@@ -19,7 +20,6 @@ repositories {
 
 dependencies {
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:4.0.1'
-	implementation 'at.favre.lib:bcrypt:0.10.2'
 	compileOnly 'org.keycloak:keycloak-core:26.2.2'
 	compileOnly 'org.keycloak:keycloak-server-spi:26.2.2'
 	compileOnly 'org.keycloak:keycloak-services:26.2.2'
@@ -36,6 +36,14 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testAnnotationProcessor 'org.projectlombok:lombok'
+}
+
+jar {
+	enabled = true
+}
+
+bootJar {
+	enabled = false
 }
 
 tasks.named('test') {

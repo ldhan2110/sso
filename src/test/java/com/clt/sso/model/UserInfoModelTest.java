@@ -2,6 +2,7 @@ package com.clt.sso.model;
 
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,9 +20,9 @@ class UserInfoModelTest {
         model.setUsrPwd("hashed");
         model.setUsrEml("john@example.com");
         model.setActFlg("Y");
-        model.setCreDt(1700000000L);
+        model.setCreDt(LocalDateTime.of(2023, 11, 14, 22, 13, 20));
         model.setCreUsrId("admin");
-        model.setUpdDt(1700000001L);
+        model.setUpdDt(LocalDateTime.of(2023, 11, 14, 22, 13, 21));
         model.setUpdUsrId("admin");
         model.setFirstName("John");
         model.setLastName("Doe");
@@ -33,9 +34,9 @@ class UserInfoModelTest {
         assertEquals("hashed", model.getUsrPwd());
         assertEquals("john@example.com", model.getUsrEml());
         assertEquals("Y", model.getActFlg());
-        assertEquals(1700000000L, model.getCreDt());
+        assertEquals(LocalDateTime.of(2023, 11, 14, 22, 13, 20), model.getCreDt());
         assertEquals("admin", model.getCreUsrId());
-        assertEquals(1700000001L, model.getUpdDt());
+        assertEquals(LocalDateTime.of(2023, 11, 14, 22, 13, 21), model.getUpdDt());
         assertEquals("admin", model.getUpdUsrId());
         assertEquals("John", model.getFirstName());
         assertEquals("Doe", model.getLastName());

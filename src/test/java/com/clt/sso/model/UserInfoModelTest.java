@@ -59,6 +59,12 @@ class UserInfoModelTest {
         assertFalse(model.isEnabled());
     }
 
+    @Test
+    void isEnabled_falseWhenActFlgNull() throws Exception {
+        setField(model, "actFlg", null);
+        assertFalse(model.isEnabled());
+    }
+
     // 4. getFirstAttribute for each known field
     @Test
     void getFirstAttribute_firstName() {
@@ -81,8 +87,14 @@ class UserInfoModelTest {
     }
 
     @Test
-    void getFirstAttribute_emailVerified() {
+    void getFirstAttribute_emailVerifiedTrue() {
         assertEquals("true", model.getFirstAttribute("emailVerified"));
+    }
+
+    @Test
+    void getFirstAttribute_emailVerifiedFalse() throws Exception {
+        setField(model, "emailVerified", false);
+        assertEquals("false", model.getFirstAttribute("emailVerified"));
     }
 
     // 5. getFirstAttribute for custom attribute from map
@@ -146,6 +158,7 @@ class UserInfoModelTest {
         assertEquals(List.of("john"), result.get(UserModel.USERNAME));
         assertEquals(List.of("true"), result.get("emailVerified"));
         assertEquals(List.of("en"), result.get("locale"));
+        assertEquals(6, result.size());
     }
 
     // 11. getAttributes returns unmodifiable map (put throws)

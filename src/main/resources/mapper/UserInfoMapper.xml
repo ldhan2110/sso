@@ -16,7 +16,39 @@
                cre_dt, cre_usr_id, upd_dt, upd_usr_id,
                first_name, last_name, email_verified
         FROM sso_user
-        WHERE UPPER(tent_id) = UPPER(#{tentId}) AND usr_id = #{usrNm}
+        WHERE UPPER(tent_id) = UPPER(#{tentId}) AND usr_nm = #{usrNm}
+    </select>
+
+    <select id="searchUsers" resultType="com.clt.sso.model.UserInfoModel">
+        SELECT tent_id, usr_id, usr_nm, usr_pwd, usr_eml, act_flg,
+               cre_dt, cre_usr_id, upd_dt, upd_usr_id,
+               first_name, last_name, email_verified
+        FROM sso_user
+        <where>
+            <if test="search != null and search != ''">
+                UPPER(usr_nm) LIKE UPPER('%' || #{search} || '%')
+                OR UPPER(usr_id) LIKE UPPER('%' || #{search} || '%')
+                OR UPPER(usr_eml) LIKE UPPER('%' || #{search} || '%')
+                OR UPPER(first_name) LIKE UPPER('%' || #{search} || '%')
+                OR UPPER(last_name) LIKE UPPER('%' || #{search} || '%')
+            </if>
+        </where>
+        ORDER BY tent_id, usr_nm
+        LIMIT #{maxResults} OFFSET #{firstResult}
+    </select>
+
+    <select id="countUsers" resultType="int">
+        SELECT COUNT(*)
+        FROM sso_user
+        <where>
+            <if test="search != null and search != ''">
+                UPPER(usr_nm) LIKE UPPER('%' || #{search} || '%')
+                OR UPPER(usr_id) LIKE UPPER('%' || #{search} || '%')
+                OR UPPER(usr_eml) LIKE UPPER('%' || #{search} || '%')
+                OR UPPER(first_name) LIKE UPPER('%' || #{search} || '%')
+                OR UPPER(last_name) LIKE UPPER('%' || #{search} || '%')
+            </if>
+        </where>
     </select>
 
 </mapper>

@@ -10,18 +10,22 @@ import org.keycloak.models.credential.PasswordCredentialModel;
 import org.keycloak.storage.StorageId;
 import org.keycloak.storage.UserStorageProvider;
 import org.keycloak.storage.user.UserLookupProvider;
+import org.keycloak.storage.user.UserQueryProvider;
 
 import org.apache.ibatis.session.SqlSession;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 import com.clt.sso.mapper.UserInfoMapper;
 import com.clt.sso.model.UserInfoAdapter;
 import com.clt.sso.model.UserInfoModel;
 
-public class CarisSsoUserStorageProvider implements UserStorageProvider, UserLookupProvider, CredentialInputValidator {
+public class CarisSsoUserStorageProvider implements UserStorageProvider, UserLookupProvider, UserQueryProvider, CredentialInputValidator {
 
     private final KeycloakSession session;
     private final ComponentModel model;
@@ -111,6 +115,41 @@ public class CarisSsoUserStorageProvider implements UserStorageProvider, UserLoo
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("MD5 not available", e);
         }
+    }
+
+    // --- UserQueryProvider ---
+
+    @Override
+    public Stream<UserModel> searchForUserStream(RealmModel realm, String search, Integer firstResult, Integer maxResults) {
+        int first = firstResult != null ? firstResult : 0;
+        int max = maxResults != null ? maxResults : Integer.MAX_VALUE;
+        List<UserInfoModel> results = mapper.searchUsers(search, first, max);
+        return results.stream()
+                .map(entity -> (UserModel) new UserInfoAdapter(session, realm, model, entity));
+    }
+
+    @Override
+    public Stream<UserModel> searchForUserStream(RealmModel realm, Map<String, String> params, Integer firstResult, Integer maxResults) {
+        String search = params.get(UserModel.SEARCH);
+        if (search == null) {
+            search = params.get(UserModel.USERNAME);
+        }
+        return searchForUserStream(realm, search != null ? search : "", firstResult, maxResults);
+    }
+
+    @Override
+    public Stream<UserModel> getGroupMembersStream(RealmModel realm, org.keycloak.models.GroupModel group, Integer firstResult, Integer maxResults) {
+        return Stream.empty();
+    }
+
+    @Override
+    public Stream<UserModel> searchForUserByUserAttributeStream(RealmModel realm, String attrName, String attrValue) {
+        return Stream.empty();
+    }
+
+    @Override
+    public int getUsersCount(RealmModel realm) {
+        return mapper.countUsers(null);
     }
 
     // --- UserStorageProvider ---

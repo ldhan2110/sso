@@ -10,6 +10,7 @@ import org.keycloak.protocol.oidc.mappers.AbstractOIDCProtocolMapper;
 import org.keycloak.protocol.oidc.mappers.OIDCAccessTokenMapper;
 import org.keycloak.protocol.oidc.mappers.OIDCIDTokenMapper;
 import org.keycloak.provider.ProviderConfigProperty;
+import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.IDToken;
 
 import java.util.Collections;
@@ -43,6 +44,22 @@ public class CarisSsoProtocolMapper extends AbstractOIDCProtocolMapper
     @Override
     public List<ProviderConfigProperty> getConfigProperties() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public AccessToken transformAccessToken(AccessToken token, ProtocolMapperModel mappingModel,
+                                            KeycloakSession session, UserSessionModel userSession,
+                                            ClientSessionContext clientSessionCtx) {
+        setClaim(token, mappingModel, userSession, session, clientSessionCtx);
+        return token;
+    }
+
+    @Override
+    public IDToken transformIDToken(IDToken token, ProtocolMapperModel mappingModel,
+                                    KeycloakSession session, UserSessionModel userSession,
+                                    ClientSessionContext clientSessionCtx) {
+        setClaim(token, mappingModel, userSession, session, clientSessionCtx);
+        return token;
     }
 
     @Override

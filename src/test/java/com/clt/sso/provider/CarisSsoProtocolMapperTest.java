@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.models.*;
+import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.IDToken;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -106,6 +107,48 @@ class CarisSsoProtocolMapperTest {
 
         assertNull(token.getOtherClaims().get("tenant_id"));
         assertEquals("cltmaster", token.getOtherClaims().get("user_id"));
+    }
+
+    @Test
+    void transformAccessToken_bypassesConfigFlag() {
+        UserInfoModel entity = new UserInfoModel();
+        entity.setTentId("CNC");
+        entity.setUsrId("cltmaster");
+
+        KeycloakSession mockSession = mock(KeycloakSession.class);
+        RealmModel mockRealm = mock(RealmModel.class);
+        ComponentModel mockComponent = mock(ComponentModel.class);
+        when(mockComponent.getId()).thenReturn("provider-id");
+
+        UserInfoAdapter adapter = new UserInfoAdapter(mockSession, mockRealm, mockComponent, entity);
+        when(userSession.getUser()).thenReturn(adapter);
+
+        AccessToken accessToken = new AccessToken();
+        AccessToken result = mapper.transformAccessToken(accessToken, mappingModel, keycloakSession, userSession, clientSessionCtx);
+
+        assertEquals("CNC", result.getOtherClaims().get("tenant_id"));
+        assertEquals("cltmaster", result.getOtherClaims().get("user_id"));
+    }
+
+    @Test
+    void transformIDToken_bypassesConfigFlag() {
+        UserInfoModel entity = new UserInfoModel();
+        entity.setTentId("CNC");
+        entity.setUsrId("cltmaster");
+
+        KeycloakSession mockSession = mock(KeycloakSession.class);
+        RealmModel mockRealm = mock(RealmModel.class);
+        ComponentModel mockComponent = mock(ComponentModel.class);
+        when(mockComponent.getId()).thenReturn("provider-id");
+
+        UserInfoAdapter adapter = new UserInfoAdapter(mockSession, mockRealm, mockComponent, entity);
+        when(userSession.getUser()).thenReturn(adapter);
+
+        IDToken idToken = new IDToken();
+        IDToken result = mapper.transformIDToken(idToken, mappingModel, keycloakSession, userSession, clientSessionCtx);
+
+        assertEquals("CNC", result.getOtherClaims().get("tenant_id"));
+        assertEquals("cltmaster", result.getOtherClaims().get("user_id"));
     }
 
     @Test

@@ -56,7 +56,7 @@
   <div class="clt-login-wrapper">
     <div class="clt-card">
       <div class="clt-logo">
-        <div class="clt-logo-text">CLT</div>
+        <img src="${url.resourcesPath}/img/clt_logo_white.png" alt="CLT" class="clt-logo-img" />
         <div class="clt-logo-subtitle">Forwarding &amp; Logistics</div>
       </div>
 

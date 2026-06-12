@@ -92,12 +92,9 @@ body#keycloak-bg::after {
   margin-bottom: 28px;
 }
 
-.clt-logo-text {
-  color: #fff;
-  font-weight: 800;
-  font-size: 28px;
-  letter-spacing: 4px;
-  line-height: 1;
+.clt-logo-img {
+  max-height: 48px;
+  width: auto;
 }
 
 .clt-logo-subtitle {

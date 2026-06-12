@@ -1,5 +1,5 @@
 <#import "template.ftl" as layout>
-<@layout.registrationLayout displayMessage=!messagesPerField.existsError('username','password'); section>
+<@layout.registrationLayout displayMessage=true; section>
 
     <#if section = "form">
         <#if realm.password>

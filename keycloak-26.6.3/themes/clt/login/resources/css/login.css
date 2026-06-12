@@ -125,6 +125,11 @@ body#keycloak-bg::after {
   font-weight: 500;
 }
 
+.clt-required {
+  color: rgba(239,68,68,0.7);
+  margin-left: 2px;
+}
+
 /* --- Inputs --- */
 .clt-input {
   width: 100%;
@@ -153,6 +158,12 @@ body#keycloak-bg::after {
   box-shadow: 0 0 0 3px rgba(239,68,68,0.1);
 }
 
+.clt-field-error {
+  color: #fca5a5;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
 /* --- Password wrapper (input + toggle) --- */
 .clt-password-wrapper {
   position: relative;
@@ -164,16 +175,17 @@ body#keycloak-bg::after {
 
 .clt-password-toggle {
   position: absolute;
-  right: 8px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.3);
   cursor: pointer;
-  padding: 4px;
-  font-size: 16px;
+  padding: 6px;
+  font-size: 14px;
   line-height: 1;
+  z-index: 1;
 }
 
 .clt-password-toggle:hover {

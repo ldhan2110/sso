@@ -2,6 +2,7 @@ package com.clt.sso.provider;
 
 import org.keycloak.component.ComponentModel;
 import org.keycloak.credential.CredentialInput;
+import org.keycloak.credential.CredentialInputUpdater;
 import org.keycloak.credential.CredentialInputValidator;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
@@ -11,12 +12,13 @@ import org.keycloak.storage.StorageId;
 import org.keycloak.storage.UserStorageProvider;
 import org.keycloak.storage.user.UserLookupProvider;
 import org.keycloak.storage.user.UserQueryProvider;
-
+import org.keycloak.storage.user.UserRegistrationProvider;
 import org.apache.ibatis.session.SqlSession;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -25,7 +27,7 @@ import com.clt.sso.mapper.UserInfoMapper;
 import com.clt.sso.model.UserInfoAdapter;
 import com.clt.sso.model.UserInfoModel;
 
-public class CarisSsoUserStorageProvider implements UserStorageProvider, UserLookupProvider, UserQueryProvider, CredentialInputValidator {
+public class CarisSsoUserStorageProvider implements UserStorageProvider, UserLookupProvider, UserQueryProvider, UserRegistrationProvider, CredentialInputValidator, CredentialInputUpdater {
 
     private final KeycloakSession session;
     private final ComponentModel model;
@@ -37,6 +39,14 @@ public class CarisSsoUserStorageProvider implements UserStorageProvider, UserLoo
         this.model = model;
         this.sqlSession = sqlSession;
         this.mapper = sqlSession.getMapper(UserInfoMapper.class);
+    }
+
+    public UserInfoMapper getMapper() {
+        return mapper;
+    }
+
+    public SqlSession getSqlSession() {
+        return sqlSession;
     }
 
     // --- UserLookupProvider ---
@@ -157,5 +167,70 @@ public class CarisSsoUserStorageProvider implements UserStorageProvider, UserLoo
     @Override
     public void close() {
         sqlSession.close();
+    }
+
+    @Override
+    public UserModel addUser(RealmModel realm, String username) {
+        String[] parts = username.split("::", 2);
+        if (parts.length != 2) {
+            return null;
+        }
+        String tentId = parts[0];
+        String usrNm = parts[1];
+
+        UserInfoModel entity = new UserInfoModel();
+        entity.setTentId(tentId);
+        entity.setUsrId(usrNm);
+        entity.setUsrNm(usrNm);
+        entity.setActFlg("Y");
+        entity.setCreDt(LocalDateTime.now());
+        entity.setCreUsrId("system");
+        entity.setUpdDt(LocalDateTime.now());
+        entity.setUpdUsrId("system");
+        entity.setEmailVerified(false);
+
+        mapper.insertUser(entity);
+        sqlSession.commit();
+
+        return new UserInfoAdapter(session, realm, model, entity);
+    }
+
+    @Override
+    public boolean removeUser(RealmModel realm, UserModel user) {
+        String externalId = StorageId.externalId(user.getId());
+        String[] parts = externalId.split("::", 2);
+        if (parts.length != 2) {
+            return false;
+        }
+        mapper.deleteUser(parts[0], parts[1]);
+        sqlSession.commit();
+        return true;
+    }
+
+    // --- CredentialInputUpdater ---
+
+    @Override
+    public boolean updateCredential(RealmModel realm, UserModel user, CredentialInput input) {
+        if (!supportsCredentialType(input.getType())) {
+            return false;
+        }
+        if (!(user instanceof UserInfoAdapter)) {
+            return false;
+        }
+        UserInfoModel entity = ((UserInfoAdapter) user).getEntity();
+        String hashedPwd = md5Hex(input.getChallengeResponse());
+        mapper.updatePassword(entity.getTentId(), entity.getUsrId(), hashedPwd);
+        sqlSession.commit();
+        return true;
+    }
+
+    @Override
+    public void disableCredentialType(RealmModel realm, UserModel user, String credentialType) {
+        // Not supported
+    }
+
+    @Override
+    public Stream<String> getDisableableCredentialTypesStream(RealmModel realm, UserModel user) {
+        return Stream.empty();
     }
 }

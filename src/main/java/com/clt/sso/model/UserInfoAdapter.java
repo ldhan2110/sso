@@ -32,7 +32,10 @@ public class UserInfoAdapter extends AbstractUserAdapterFederatedStorage {
 
     @Override
     public void setUsername(String username) {
-        // Read-only external storage — no-op
+        String[] parts = username.split("::", 2);
+        if (parts.length == 2) {
+            entity.setUsrNm(parts[1]);
+        }
     }
 
     @Override
@@ -42,7 +45,7 @@ public class UserInfoAdapter extends AbstractUserAdapterFederatedStorage {
 
     @Override
     public void setEmail(String email) {
-        // Read-only external storage — no-op
+        entity.setUsrEml(email);
     }
 
     @Override
@@ -52,7 +55,7 @@ public class UserInfoAdapter extends AbstractUserAdapterFederatedStorage {
 
     @Override
     public void setFirstName(String firstName) {
-        // Read-only external storage — no-op
+        entity.setFirstName(firstName);
     }
 
     @Override
@@ -62,7 +65,7 @@ public class UserInfoAdapter extends AbstractUserAdapterFederatedStorage {
 
     @Override
     public void setLastName(String lastName) {
-        // Read-only external storage — no-op
+        entity.setLastName(lastName);
     }
 
     @Override
@@ -72,7 +75,7 @@ public class UserInfoAdapter extends AbstractUserAdapterFederatedStorage {
 
     @Override
     public void setEmailVerified(boolean verified) {
-        // Read-only external storage — no-op
+        entity.setEmailVerified(verified);
     }
 
     @Override
@@ -82,7 +85,7 @@ public class UserInfoAdapter extends AbstractUserAdapterFederatedStorage {
 
     @Override
     public void setEnabled(boolean enabled) {
-        // Read-only external storage — no-op
+        entity.setActFlg(enabled ? "Y" : "N");
     }
 
     @Override

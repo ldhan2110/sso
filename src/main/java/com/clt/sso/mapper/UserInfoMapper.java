@@ -15,4 +15,15 @@ public interface UserInfoMapper {
                                      @Param("firstResult") int firstResult,
                                      @Param("maxResults") int maxResults);
     int countUsers(@Param("search") String search);
+
+    void insertUser(UserInfoModel user);
+
+    void updateUser(UserInfoModel user);
+
+    void updatePassword(@Param("tentId") String tentId,
+                        @Param("usrId") String usrId,
+                        @Param("usrPwd") String usrPwd);
+
+    void deleteUser(@Param("tentId") String tentId,
+                    @Param("usrId") String usrId);
 }

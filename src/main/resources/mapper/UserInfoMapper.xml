@@ -51,4 +51,38 @@
         </where>
     </select>
 
+    <insert id="insertUser" parameterType="com.clt.sso.model.UserInfoModel">
+        INSERT INTO sso_user (tent_id, usr_id, usr_nm, usr_pwd, usr_eml, act_flg,
+                              cre_dt, cre_usr_id, upd_dt, upd_usr_id,
+                              first_name, last_name, email_verified)
+        VALUES (#{tentId}, #{usrId}, #{usrNm}, #{usrPwd}, #{usrEml}, #{actFlg},
+                #{creDt}, #{creUsrId}, #{updDt}, #{updUsrId},
+                #{firstName}, #{lastName}, #{emailVerified})
+    </insert>
+
+    <update id="updateUser" parameterType="com.clt.sso.model.UserInfoModel">
+        UPDATE sso_user
+        SET usr_nm = #{usrNm},
+            usr_eml = #{usrEml},
+            first_name = #{firstName},
+            last_name = #{lastName},
+            email_verified = #{emailVerified},
+            act_flg = #{actFlg},
+            upd_dt = #{updDt},
+            upd_usr_id = #{updUsrId}
+        WHERE tent_id = #{tentId} AND usr_id = #{usrId}
+    </update>
+
+    <update id="updatePassword">
+        UPDATE sso_user
+        SET usr_pwd = #{usrPwd},
+            upd_dt = NOW()
+        WHERE tent_id = #{tentId} AND usr_id = #{usrId}
+    </update>
+
+    <delete id="deleteUser">
+        DELETE FROM sso_user
+        WHERE tent_id = #{tentId} AND usr_id = #{usrId}
+    </delete>
+
 </mapper>

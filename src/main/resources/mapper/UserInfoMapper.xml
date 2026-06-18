@@ -19,6 +19,22 @@
         WHERE UPPER(tent_id) = UPPER(#{tentId}) AND usr_nm = #{usrNm}
     </select>
 
+    <select id="findByUsrNm" resultType="com.clt.sso.model.UserInfoModel">
+        SELECT tent_id, usr_id, usr_nm, usr_pwd, usr_eml, act_flg,
+               cre_dt, cre_usr_id, upd_dt, upd_usr_id,
+               first_name, last_name, email_verified
+        FROM sso_user
+        WHERE usr_nm = #{usrNm} AND act_flg = 'Y'
+    </select>
+
+    <select id="findByEmail" resultType="com.clt.sso.model.UserInfoModel">
+        SELECT tent_id, usr_id, usr_nm, usr_pwd, usr_eml, act_flg,
+               cre_dt, cre_usr_id, upd_dt, upd_usr_id,
+               first_name, last_name, email_verified
+        FROM sso_user
+        WHERE LOWER(usr_eml) = LOWER(#{usrEml}) AND act_flg = 'Y'
+    </select>
+
     <select id="searchUsers" resultType="com.clt.sso.model.UserInfoModel">
         SELECT tent_id, usr_id, usr_nm, usr_pwd, usr_eml, act_flg,
                cre_dt, cre_usr_id, upd_dt, upd_usr_id,

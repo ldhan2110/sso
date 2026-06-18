@@ -68,19 +68,35 @@ public class CarisSsoUserStorageProvider implements UserStorageProvider, UserLoo
     @Override
     public UserModel getUserByUsername(RealmModel realm, String username) {
         String[] parts = username.split("::", 2);
-        if (parts.length != 2) {
-            return null;
+        if (parts.length == 2) {
+            UserInfoModel entity = mapper.findByTentIdAndUsrNm(parts[0], parts[1]);
+            if (entity != null) {
+                return new UserInfoAdapter(session, realm, model, entity);
+            }
         }
-        UserInfoModel entity = mapper.findByTentIdAndUsrNm(parts[0], parts[1]);
-        if (entity == null) {
-            return null;
+        // Fallback: try as email (supports forgot-password with plain username/email)
+        UserInfoModel entity = mapper.findByEmail(username);
+        if (entity != null) {
+            return new UserInfoAdapter(session, realm, model, entity);
         }
-        return new UserInfoAdapter(session, realm, model, entity);
+        // Fallback: try as plain username across all tenants
+        entity = mapper.findByUsrNm(username);
+        if (entity != null) {
+            return new UserInfoAdapter(session, realm, model, entity);
+        }
+        return null;
     }
 
     @Override
     public UserModel getUserByEmail(RealmModel realm, String email) {
-        return null;
+        if (email == null || email.isBlank()) {
+            return null;
+        }
+        UserInfoModel entity = mapper.findByEmail(email);
+        if (entity == null) {
+            return null;
+        }
+        return new UserInfoAdapter(session, realm, model, entity);
     }
 
     // --- CredentialInputValidator ---

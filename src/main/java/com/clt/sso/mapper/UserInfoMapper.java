@@ -11,6 +11,8 @@ public interface UserInfoMapper {
                                         @Param("usrId") String usrId);
     UserInfoModel findByTentIdAndUsrNm(@Param("tentId") String tentId,
                                         @Param("usrNm") String usrNm);
+    UserInfoModel findByEmail(@Param("usrEml") String usrEml);
+    UserInfoModel findByUsrNm(@Param("usrNm") String usrNm);
     List<UserInfoModel> searchUsers(@Param("search") String search,
                                      @Param("firstResult") int firstResult,
                                      @Param("maxResults") int maxResults);

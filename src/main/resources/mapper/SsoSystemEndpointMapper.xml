@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clt.sso.mapper.SsoSystemEndpointMapper">
+
+    <select id="findActiveByType" resultType="com.clt.sso.model.SsoSystemEndpointModel">
+        SELECT endpoint_id, app_name, endpoint_url, endpoint_type,
+               sync_secret, remarks, act_flg, cre_dt, cre_usr_id, upd_dt, upd_usr_id
+        FROM sso_system_endpoint
+        WHERE act_flg = 'Y' AND endpoint_type = #{endpointType}
+        ORDER BY app_name
+    </select>
+
+    <select id="findAll" resultType="com.clt.sso.model.SsoSystemEndpointModel">
+        SELECT endpoint_id, app_name, endpoint_url, endpoint_type,
+               sync_secret, remarks, act_flg, cre_dt, cre_usr_id, upd_dt, upd_usr_id
+        FROM sso_system_endpoint
+        ORDER BY app_name, endpoint_type
+    </select>
+
+</mapper>

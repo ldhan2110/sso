@@ -32,5 +32,6 @@
     </environments>
     <mappers>
         <mapper resource="mapper/UserInfoMapper.xml"/>
+        <mapper resource="mapper/SsoSystemEndpointMapper.xml"/>
     </mappers>
 </configuration>
